@@ -10,6 +10,8 @@
 #include <cassert>
 #include "traffic_type.hpp"
 #include "traffic_roi.hpp"
+#include "traffic_process_handle.hpp"
+#include "traffic_event.hpp"
 
 class TrafficProcess {
  public:
@@ -24,7 +26,9 @@ class TrafficProcess {
 	return this->type_;
   }
 
-  virtual void Run(const Frame &frame, const std::vector<std::shared_ptr<TrafficRoi>> &roi_list) = 0;
+  virtual void Run(const Frame &frame,
+				   const std::vector<std::shared_ptr<TrafficRoi>> &roi_list,
+				   const std::function<void(const TrafficEvent &event)> &callback) = 0;
 
  private:
   TrafficType type_ = TrafficType::TRAFFIC_UNKNOWN;
@@ -41,7 +45,9 @@ class TrafficProcessBaseDetection : public TrafficProcess {
 
   }
 
-  void Run(const Frame &frame, const std::vector<std::shared_ptr<TrafficRoi>> &roi_list) override {
+  void Run(const Frame &frame,
+		   const std::vector<std::shared_ptr<TrafficRoi>> &roi_list,
+		   const std::function<void(const TrafficEvent &event)> &callback) override {
 	for (int i = 0; i < roi_list.size(); ++i) {
 	  const std::shared_ptr<TrafficRoi> &roi = roi_list.at(i);
 	  TrafficRoiBase *roi_base = dynamic_cast<TrafficRoiBase *>(roi.get());
@@ -50,7 +56,10 @@ class TrafficProcessBaseDetection : public TrafficProcess {
 	  //检测事件类型和有效范围所属类型是否一致
 	  assert(roi_base->get_type() == TrafficProcess::get_type());
 	}
-	std::cout << "process for base detection\n";
+	// 推送一个基础检测事件
+	TrafficEvent event(0, TrafficType::TRAFFIC_BASE_DETECTION, "", nullptr);
+	callback(event);
+	printf("process for base detection\n");
   }
 };
 
@@ -64,7 +73,9 @@ class TrafficProcessConverseDriving : public TrafficProcess {
 
   }
 
-  void Run(const Frame &frame, const std::vector<std::shared_ptr<TrafficRoi>> &roi_list) override {
+  void Run(const Frame &frame,
+		   const std::vector<std::shared_ptr<TrafficRoi>> &roi_list,
+		   const std::function<void(const TrafficEvent &event)> &callback) override {
 	for (int i = 0; i < roi_list.size(); ++i) {
 	  const std::shared_ptr<TrafficRoi> &roi = roi_list.at(i);
 	  TrafficROIJudgement *roi_judgement = dynamic_cast<TrafficROIJudgement *>(roi.get());
@@ -72,7 +83,10 @@ class TrafficProcessConverseDriving : public TrafficProcess {
 	  //检测事件类型和有效范围所属类型是否一致
 	  assert(roi_judgement->get_type() == TrafficProcess::get_type());
 	}
-	std::cout << "process for conversing driving detection\n";
+	// 推送逆行事件
+	printf("process for conversing driving detection\n");
+	TrafficEvent event(0, TrafficType::TRAFFIC_CONVERSE_DRIVING, "", nullptr);
+	callback(event);
   }
 };
 
@@ -86,7 +100,9 @@ class TrafficProcessIllegalStopping : public TrafficProcess {
 
   }
 
-  void Run(const Frame &frame, const std::vector<std::shared_ptr<TrafficRoi>> &roi_list) override {
+  void Run(const Frame &frame,
+		   const std::vector<std::shared_ptr<TrafficRoi>> &roi_list,
+		   const std::function<void(const TrafficEvent &event)> &callback) override {
 	for (int i = 0; i < roi_list.size(); ++i) {
 	  const std::shared_ptr<TrafficRoi> &roi = roi_list.at(i);
 	  TrafficROIJudgement *roi_stopping = dynamic_cast<TrafficROIJudgement *>(roi.get());
@@ -94,7 +110,10 @@ class TrafficProcessIllegalStopping : public TrafficProcess {
 	  //检测事件类型和有效范围roi所属类型是否一致
 	  assert(roi_stopping->get_type() == TrafficProcess::get_type());
 	}
-	std::cout << "process for illegal stopping\n";
+	//推送非法停车事件
+	printf("process for illegal stopping\n");
+	TrafficEvent event(0, TrafficType::TRAFFIC_ILLEGAL_STOPPING, "", nullptr);
+	callback(event);
   }
 };
 

@@ -9,28 +9,38 @@
 #include <vector>
 #include <map>
 #include <mutex>
+#include <functional>
 
 #include "traffic_roi.hpp"
 #include "traffic_frame.hpp"
 #include "traffic_type.hpp"
+#include "traffic_event.hpp"
 #include "synchronized_queue.hpp"
 
 class TrafficProcessHandle {
  public:
   TrafficProcessHandle() {
-	std::thread t([&]() {
+	std::thread t1([&]() {
 	  this->Run();
 	});
-	thread_self_ = std::move(t);
+	std::thread t2([&]() {
+	  this->ServiceEventPush();
+	});
+	threads_.push_back(std::move(t1));
+	threads_.push_back(std::move(t2));
   }
   ~TrafficProcessHandle() {
-	if (thread_self_.joinable()) {
-	  thread_self_.join();
+	for (std::thread &t: this->threads_) {
+	  if (t.joinable()) {
+		t.join();
+	  }
 	}
   }
 
  private:
   void Run() {
+	std::function<void(const TrafficEvent &event)>
+		callback = std::bind(&TrafficProcessHandle::ServiceEventPull, this, std::placeholders::_1);
 	while (true) {
 	  Frame frame;
 	  this->frames_.pop(frame);
@@ -60,7 +70,7 @@ class TrafficProcessHandle {
 			}
 		  }
 		  if (!roi_list.empty()) {
-			process_ptr->Run(frame, roi_list);
+			process_ptr->Run(frame, roi_list, callback);
 		  } else {
 //			LOG INFO NO ROI RULES
 		  }
@@ -94,11 +104,37 @@ class TrafficProcessHandle {
 	std::unique_lock<std::mutex> lock(this->mutex_);
 	this->rois_ = rois;
   }
+
+  void ServiceEventPush() {
+	while (true) {
+	  // websocket推送交通事件
+	  TrafficEvent event;
+	  bool pop_success = this->events_.pop(event);
+	  if (pop_success) {
+		printf("Push one event, type:%d\n", event.get_type());
+	  }
+	}
+  }
+
+  void ServiceEventPull(const TrafficEvent &event) {
+	int retry_time = 3; // 尝试推送事件的次数
+	bool push_success = false;
+	for (int i = 0; i < retry_time; ++i) {
+	  push_success = events_.push(event);
+	  if (push_success) {
+		break;
+	  }
+	}
+	if (!push_success) {
+	  // 事件发送失败
+	}
+  }
  private:
   std::mutex mutex_;
   std::map<std::string, std::shared_ptr<TrafficRoi>> rois_;
+  SynchronizedQueue<TrafficEvent> events_;
   SynchronizedQueue<Frame> frames_;
   std::vector<std::shared_ptr<TrafficProcess>> processes_;
-  std::thread thread_self_;
+  std::vector<std::thread> threads_;
 };
 #endif //TRAFFICPROCESS_INCLUDE_TRAFFIC_PROCESS_HANDLE_HPP_
