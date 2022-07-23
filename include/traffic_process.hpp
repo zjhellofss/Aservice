@@ -89,10 +89,10 @@ class TrafficProcessIllegalStopping : public TrafficProcess {
   void Run(const Frame &frame, const std::vector<std::shared_ptr<TrafficRoi>> &roi_list) override {
 	for (int i = 0; i < roi_list.size(); ++i) {
 	  const std::shared_ptr<TrafficRoi> &roi = roi_list.at(i);
-	  TrafficROIJudgement *roi_judgement = dynamic_cast<TrafficROIJudgement *>(roi.get());
-	  assert(roi_judgement != nullptr);
-	  //检测事件类型和有效范围所属类型是否一致
-	  assert(roi_judgement->get_type() == TrafficProcess::get_type());
+	  TrafficROIJudgement *roi_stopping = dynamic_cast<TrafficROIJudgement *>(roi.get());
+	  assert(roi_stopping != nullptr);
+	  //检测事件类型和有效范围roi所属类型是否一致
+	  assert(roi_stopping->get_type() == TrafficProcess::get_type());
 	}
 	std::cout << "process for illegal stopping\n";
   }

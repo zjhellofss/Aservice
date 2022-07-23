@@ -46,7 +46,7 @@ class TrafficProcessHandle {
 		continue;
 	  }
 	  for (size_t i = 0; i < processes.size(); ++i) {
-		std::shared_ptr process_ptr = processes.at(i);
+		std::shared_ptr<TrafficProcess> process_ptr = processes.at(i);
 		const auto type = process_ptr->get_type();
 		if (type == TrafficType::TRAFFIC_UNKNOWN) {
 		  continue;
