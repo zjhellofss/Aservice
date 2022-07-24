@@ -5,6 +5,7 @@
 #ifndef TRAFFICPROCESS_INCLUDE_TRAFFIC_SERVICE_HPP_
 #define TRAFFICPROCESS_INCLUDE_TRAFFIC_SERVICE_HPP_
 #include "traffic_process_handle.hpp"
+#include "traffic_roi_handle.hpp"
 
 class TrafficService {
  public:
@@ -82,6 +83,6 @@ class TrafficService {
   TrafficService &operator=(const TrafficService &) = delete;
  private:
   TrafficProcessHandle process_handle_;
-  TrafficROIHandle roi_handle_;
+  TrafficRoiHandle roi_handle_;
 };
 #endif //TRAFFICPROCESS_INCLUDE_TRAFFIC_SERVICE_HPP_

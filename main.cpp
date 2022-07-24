@@ -11,13 +11,13 @@ int main() {
   service.add_roi("0571", roi_base2);
 
   std::shared_ptr<TrafficRoi>
-	  roi_judgement1 = std::make_shared<TrafficROIJudgement>(TrafficType::TRAFFIC_CONVERSE_DRIVING);
+	  roi_judgement1 = std::make_shared<TrafficRoiJudgement>(TrafficType::TRAFFIC_CONVERSE_DRIVING);
   std::shared_ptr<TrafficRoi>
-	  roi_judgement2 = std::make_shared<TrafficROIJudgement>(TrafficType::TRAFFIC_CONVERSE_DRIVING);
+	  roi_judgement2 = std::make_shared<TrafficRoiJudgement>(TrafficType::TRAFFIC_CONVERSE_DRIVING);
   std::shared_ptr<TrafficRoi>
-	  roi_judgement3 = std::make_shared<TrafficROIJudgement>(TrafficType::TRAFFIC_ILLEGAL_STOPPING);
+	  roi_judgement3 = std::make_shared<TrafficRoiJudgement>(TrafficType::TRAFFIC_ILLEGAL_STOPPING);
   std::shared_ptr<TrafficRoi>
-	  roi_judgement4 = std::make_shared<TrafficROIJudgement>(TrafficType::TRAFFIC_ILLEGAL_STOPPING);
+	  roi_judgement4 = std::make_shared<TrafficRoiJudgement>(TrafficType::TRAFFIC_ILLEGAL_STOPPING);
 
   service.add_roi("0573", roi_judgement1);
   service.add_roi("0574", roi_judgement2);

@@ -78,7 +78,7 @@ class TrafficProcessConverseDriving : public TrafficProcess {
 		   const std::function<void(const TrafficEvent &event)> &callback) override {
 	for (int i = 0; i < roi_list.size(); ++i) {
 	  const std::shared_ptr<TrafficRoi> &roi = roi_list.at(i);
-	  TrafficROIJudgement *roi_judgement = dynamic_cast<TrafficROIJudgement *>(roi.get());
+	  TrafficRoiJudgement *roi_judgement = dynamic_cast<TrafficRoiJudgement *>(roi.get());
 	  assert(roi_judgement != nullptr);
 	  //检测事件类型和有效范围所属类型是否一致
 	  assert(roi_judgement->get_type() == TrafficProcess::get_type());
@@ -105,7 +105,7 @@ class TrafficProcessIllegalStopping : public TrafficProcess {
 		   const std::function<void(const TrafficEvent &event)> &callback) override {
 	for (int i = 0; i < roi_list.size(); ++i) {
 	  const std::shared_ptr<TrafficRoi> &roi = roi_list.at(i);
-	  TrafficROIJudgement *roi_stopping = dynamic_cast<TrafficROIJudgement *>(roi.get());
+	  TrafficRoiJudgement *roi_stopping = dynamic_cast<TrafficRoiJudgement *>(roi.get());
 	  assert(roi_stopping != nullptr);
 	  //检测事件类型和有效范围roi所属类型是否一致
 	  assert(roi_stopping->get_type() == TrafficProcess::get_type());
